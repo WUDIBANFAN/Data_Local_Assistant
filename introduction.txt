@@ -1,0 +1,100 @@
+# 🏎️ 保时捷测试工单智能分析系统
+
+模块化重构版 v4.0 | Streamlit + DuckDB + DeepSeek V4 Pro + Plotly
+
+---
+
+## 📁 项目结构
+
+```
+Data_Local_Assistant/
+├── config.py          # 全局配置（路径/常量/LLM/环境变量）
+├── data_loader.py     # 数据加载（多CSV扫描/OneDrive锁重试/清洗/DuckDB写入）
+├── visualizer.py      # 可视化仪表盘（8种交互式图表）
+├── ai_query.py        # NL2SQL 智能查询（DeepSeek V4 Pro + LangChain Agent）
+├── utils.py           # 工具函数（日志/导出/周报/异常处理）
+├── main.py            # Streamlit 主入口（极简编排）
+├── .env               # 环境变量（API Key 等）
+├── requirements.txt   # Python 依赖清单
+└── csv_example/       # 测试 CSV 文件
+```
+
+---
+
+## 🚀 快速开始
+
+### 1. 安装依赖
+```bash
+pip install -r requirements.txt
+```
+
+### 2. 配置 API Key
+编辑 `.env` 文件（已预配置）：
+```ini
+LLM_API_KEY=your-api-key
+LLM_TYPE=deepseek
+LLM_MODEL=deepseek-chat
+DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
+```
+
+### 3. 运行系统
+```bash
+python -m streamlit run main.py
+```
+
+---
+
+## ⚙️ 核心功能
+
+| 功能 | 模块 | 说明 |
+|------|------|------|
+| 📂 时间段加载 | `data_loader.py` | 按自定义日期范围加载多个 CSV，自动跳过元数据行 |
+| 🛡️ OneDrive 兼容 | `data_loader.py` | 文件锁自动重试，不崩溃 |
+| 🧹 智能清洗 | `data_loader.py` | 编码检测、德式格式转换、去重 |
+| 📊 可视化仪表盘 | `visualizer.py` | 趋势/状态/功能/人员/SW-HW/严重等级/故障频率 |
+| 💬 NL2SQL | `ai_query.py` | DeepSeek V4 Pro 自然语言查询（只读 SELECT） |
+| 📝 一键周报 | `utils.py` | 本周统计 + AI 总结 |
+| 📥 CSV 导出 | `utils.py` | 筛选结果导出 UTF-8-BOM |
+| 🔍 筛选器 | `main.py` | 日期/状态/功能模块/负责人 |
+
+---
+
+## 🏗️ 技术架构
+
+```
+Streamlit Web UI (main.py)
+├── 侧边栏: 时间段选择 + 筛选器
+└── Tab: 仪表盘 | 智能查询 | 原始数据 | 周报
+       │              │           │         │
+       ▼              ▼           ▼         ▼
+visualizer.py   ai_query.py   utils.py   utils.py
+  (Plotly)     (LangChain)    (导出)    (周报)
+       │              │
+       └──────┬───────┘
+              ▼
+       data_loader.py
+       (DuckDB Native API)
+              │
+              ▼
+       OneDrive CSV 文件
+```
+
+---
+
+## ❓ 常见问题
+
+**Q: 运行报错 "No module named 'xxx'"**
+```bash
+pip install -r requirements.txt
+```
+
+**Q: OneDrive 文件被锁定**
+系统自动重试 5 次；等待同步完成后刷新浏览器。
+
+**Q: NL2SQL 查询无响应**
+检查 `.env` 中 `LLM_API_KEY` 是否正确，确认 DeepSeek API 可用。
+
+---
+
+## 📄 许可证
+仅供内部使用。数据来源于保时捷测试管理系统，请勿外传。
